@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.E.F. Contact Engine CRM - Admin Portal</title>
+    <link rel="stylesheet" href="css/shared-styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>💼</text></svg>">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header class="topbar">
+        <h1>S.E.F. Contact Engine CRM - Admin Portal</h1>
+        <div class="topbar-controls">
+            <select id="roleSelector" class="role-selector">
+                <option value="admin">Admin Portal</option>
+                <option value="agent1">Agent: John Smith</option>
+                <option value="agent2">Agent: Sarah Jones</option>
+            </select>
+            <button id="emergencyReset" class="emergency-reset" title="Emergency Reset (Ctrl+Shift+R)">
+                🚨 Emergency Reset
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="dashboard">
+        <!-- Master Metrics Card -->
+        <section class="card">
+            <h3>📊 Master Dashboard Metrics</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalPortfolios">0</div>
+                    <div class="stat-label">Total Portfolios</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalAccounts">0</div>
+                    <div class="stat-label">Total Accounts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalValue">$0</div>
+                    <div class="stat-label">Total Portfolio Value</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="recoveredValue">$0</div>
+                    <div class="stat-label">Total Recovered</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="activeAgents">0</div>
+                    <div class="stat-label">Active Agents</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="recoveryRate">0%</div>
+                    <div class="stat-label">Recovery Rate</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Portfolio Management Card -->
+        <section class="card">
+            <h3>📂 Portfolio Management</h3>
+            <div class="card-content">
+                <div style="margin-bottom: 15px;">
+                    <button class="btn" onclick="uploadPortfolio()">📤 Upload Portfolio</button>
+                    <button class="btn btn-secondary" onclick="loadPortfolioList()">📋 View All Portfolios</button>
+                    <button class="btn btn-outline" onclick="showDownloadOptions()">💾 Export Data</button>
+                </div>
+                
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search portfolios..." data-target=".searchable">
+                    <span class="search-icon">🔍</span>
+                </div>
+                
+                <div id="portfolioList">
+                    <p style="text-align: center; color: #cccccc;">Click "View All Portfolios" to load portfolio data</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Agent Management Card -->
+        <section class="card">
+            <h3>👥 Agent Management</h3>
+            <div class="card-content">
+                <div style="margin-bottom: 15px;">
+                    <button class="btn" onclick="addNewUser()">➕ Add New Agent</button>
+                    <button class="btn btn-secondary" onclick="loadUserList()">👁️ View All Users</button>
+                    <button class="btn btn-outline" onclick="exportData('users', 'csv')">📊 Export User Data</button>
+                </div>
+                
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search users..." data-target=".searchable">
+                    <span class="search-icon">🔍</span>
+                </div>
+                
+                <div id="userList">
+                    <p style="text-align: center; color: #cccccc;">Click "View All Users" to load user data</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Payment Calendar Card -->
+        <section class="card">
+            <h3>📅 Master Payment Calendar</h3>
+            <div class="card-content">
+                <div style="margin-bottom: 15px;">
+                    <button class="btn" onclick="addNewPayment()">💰 Add Payment</button>
+                    <button class="btn btn-secondary" onclick="exportPayments('csv', false)">📊 Export Payments</button>
+                    <button class="btn btn-outline" onclick="exportPayments('csv', true)">🔒 Export Masked</button>
+                </div>
+                
+                <div id="paymentCalendar">
+                    <!-- Calendar will be rendered here -->
+                </div>
+                
+                <!-- Payment Metrics -->
+                <div class="stats-grid" style="margin-top: 20px;">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalPayments">0</div>
+                        <div class="stat-label">Total Payments</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="completedPayments">0</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="overduePayments">0</div>
+                        <div class="stat-label">Overdue</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="collectionRate">0%</div>
+                        <div class="stat-label">Collection Rate</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Portfolio Insights Card -->
+        <section class="card">
+            <h3>💡 Portfolio Insights & Analytics</h3>
+            <div class="card-content">
+                <div id="portfolioInsights">
+                    <!-- Portfolio insights will be loaded here -->
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-outline" onclick="generateReport('performance')">📈 Performance Report</button>
+                    <button class="btn btn-outline" onclick="generateReport('portfolio')">📊 Portfolio Summary</button>
+                    <button class="btn btn-outline" onclick="generateReport('recovery')">💹 Recovery Analysis</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Activity Card -->
+        <section class="card">
+            <h3>🕒 Recent Activity</h3>
+            <div class="card-content">
+                <div id="recentActivity">
+                    <!-- Recent activities will be loaded here -->
+                </div>
+                
+                <div style="margin-top: 15px; text-align: center;">
+                    <button class="btn btn-outline" onclick="loadRecentActivity()">🔄 Refresh Activity</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- System Administration Card -->
+        <section class="card">
+            <h3>⚙️ System Administration</h3>
+            <div class="card-content">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div>
+                        <h4 style="color: #1ECBE1; margin-bottom: 10px;">User Management</h4>
+                        <button class="btn btn-sm" onclick="loadUserList()">Manage Users</button>
+                        <button class="btn btn-outline btn-sm" onclick="exportData('users', 'csv')">Export Users</button>
+                    </div>
+                    
+                    <div>
+                        <h4 style="color: #1ECBE1; margin-bottom: 10px;">Data Management</h4>
+                        <button class="btn btn-sm" onclick="showDownloadOptions()">Backup Data</button>
+                        <button class="btn btn-outline btn-sm" onclick="emergencyReset()">System Reset</button>
+                    </div>
+                    
+                    <div>
+                        <h4 style="color: #1ECBE1; margin-bottom: 10px;">Reports & Analytics</h4>
+                        <button class="btn btn-sm" onclick="generateReport('performance')">Performance</button>
+                        <button class="btn btn-outline btn-sm" onclick="generateReport('recovery')">Recovery</button>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 15px; background: rgba(30, 203, 225, 0.1); border-radius: 8px;">
+                    <h4 style="color: #1ECBE1; margin-bottom: 10px;">🔒 Security & Compliance</h4>
+                    <p style="color: #cccccc; font-size: 0.9rem; margin-bottom: 10px;">
+                        All data exports include masking options for sensitive information. 
+                        System activities are logged for audit purposes.
+                    </p>
+                    <div>
+                        <button class="btn btn-outline btn-sm">View Audit Logs</button>
+                        <button class="btn btn-outline btn-sm">Security Settings</button>
+                        <button class="btn btn-outline btn-sm">Compliance Report</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Quick Access Notification -->
+    <div style="position: fixed; bottom: 20px; right: 20px; background: linear-gradient(135deg, #1ECBE1, #3AFCA0); color: #101419; padding: 10px 15px; border-radius: 8px; font-size: 0.9rem; z-index: 1000;">
+        <strong>🔥 Quick Access:</strong> Alt+C for Consumer Search | Ctrl+Shift+R for Emergency Reset
+    </div>
+
+    <!-- Loading Scripts -->
+    <script src="js/shared-functions.js"></script>
+    <script src="js/calendar-functions.js"></script>
+    <script src="js/admin-functions.js"></script>
+
+    <script>
+        // Initialize admin portal
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 S.E.F. Contact Engine CRM - Admin Portal Loading...');
+            
+            // Set current role to admin
+            currentRole = 'admin';
+            updateUIForRole('admin');
+            
+            // Initialize admin dashboard
+            initializeAdminDashboard();
+            
+            // Initialize calendar
+            initializeCalendar('paymentCalendar');
+            
+            // Update payment metrics
+            updatePaymentMetrics();
+            
+            console.log('✅ Admin Portal Ready!');
+            showNotification('Admin Portal loaded successfully!', 'success', 2000);
+        });
+
+        // Role selector handler
+        document.getElementById('roleSelector').addEventListener('change', function(e) {
+            const selectedRole = e.target.value;
+            
+            if (selectedRole !== 'admin') {
+                // Redirect to agent portal
+                if (selectedRole === 'agent1' || selectedRole === 'agent2') {
+                    localStorage.setItem('currentRole', selectedRole);
+                    window.location.href = 'agent-portal.html';
+                }
+            }
+        });
+
+        // Add some enhanced keyboard shortcuts for admin
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+Shift+P for Portfolio Upload
+            if (e.ctrlKey && e.shiftKey && e.key === 'P') {
+                e.preventDefault();
+                uploadPortfolio();
+            }
+            
+            // Ctrl+Shift+U for User Management
+            if (e.ctrlKey && e.shiftKey && e.key === 'U') {
+                e.preventDefault();
+                loadUserList();
+            }
+            
+            // Ctrl+Shift+D for Download Options
+            if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+                e.preventDefault();
+                showDownloadOptions();
+            }
+        });
+
+        // Enhanced error handling for admin portal
+        window.addEventListener('error', function(e) {
+            console.error('Admin Portal Error:', e.error);
+            showNotification('Admin Portal Error: ' + e.message, 'error', 5000);
+        });
+
+        // Auto-refresh metrics every 30 seconds
+        setInterval(function() {
+            if (document.visibilityState === 'visible') {
+                updateDashboardMetrics();
+                updatePaymentMetrics();
+            }
+        }, 30000);
+    </script>
+
+    <!-- Status indicator -->
+    <div id="connectionStatus" style="position: fixed; top: 70px; right: 20px; padding: 5px 10px; background: #3AFCA0; color: #101419; border-radius: 15px; font-size: 0.8rem; font-weight: 600; z-index: 1001;">
+        🟢 Admin Portal Active
+    </div>
+</body>
+</html>

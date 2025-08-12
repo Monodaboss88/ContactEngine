@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.E.F. Contact Engine CRM - Agent Portal</title>
+    <link rel="stylesheet" href="css/shared-styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>👤</text></svg>">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header class="topbar">
+        <h1 id="portalTitle">S.E.F. Contact Engine CRM - Agent Portal</h1>
+        <div class="topbar-controls">
+            <select id="roleSelector" class="role-selector">
+                <option value="agent1">Agent: John Smith</option>
+                <option value="agent2">Agent: Sarah Jones</option>
+                <option value="admin">Admin Portal</option>
+            </select>
+            <button id="emergencyReset" class="emergency-reset" title="Emergency Reset (Ctrl+Shift+R)">
+                🚨 Emergency Reset
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="dashboard">
+        <!-- Agent Metrics Card -->
+        <section class="card">
+            <h3>📊 My Performance Dashboard</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="assignedAccounts">0</div>
+                    <div class="stat-label">Assigned Accounts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalBalance">$0</div>
+                    <div class="stat-label">Total Balance</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="monthlyRecovered">$0</div>
+                    <div class="stat-label">Monthly Recovered</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="contactsToday">0</div>
+                    <div class="stat-label">Contacts Today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="successRate">0%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="averagePayment">$0</div>
+                    <div class="stat-label">Average Payment</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Assigned Accounts Card -->
+        <section class="card">
+            <h3>📋 My Assigned Accounts</h3>
+            <div class="card-content">
+                <div style="margin-bottom: 15px;">
+                    <button class="btn" onclick="openConsumerQuickAccess()" title="Alt+C">🔍 Quick Consumer Search</button>
+                    <button class="btn btn-secondary" onclick="loadAssignedAccounts()">🔄 Refresh Accounts</button>
+                    <button class="btn btn-outline" onclick="loadAgentReports()">📊 My Reports</button>
+                </div>
+                
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search my accounts..." data-target=".searchable">
+                    <span class="search-icon">🔍</span>
+                </div>
+                
+                <div id="assignedAccountsList">
+                    <!-- Assigned accounts will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Payment Calendar Card -->
+        <section class="card">
+            <h3>📅 Payment Calendar - My Accounts</h3>
+            <div class="card-content">
+                <div style="margin-bottom: 15px;">
+                    <button class="btn" onclick="addNewPayment()" style="display: none;">💰 Add Payment</button>
+                    <button class="btn btn-secondary" onclick="renderCalendar()">🔄 Refresh Calendar</button>
+                    <p style="color: #1ECBE1; font-size: 0.9rem; margin: 0;">
+                        💡 Click on calendar days to view payments. Only your assigned accounts are shown.
+                    </p>
+                </div>
+                
+                <div id="agentCalendar">
+                    <!-- Calendar will be rendered here -->
+                </div>
+                
+                <!-- Payment Metrics for Agent -->
+                <div class="stats-grid" style="margin-top: 20px;">
+                    <div class="stat-card">
+                        <div class="stat-value" id="myPendingPayments">0</div>
+                        <div class="stat-label">My Pending</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="myCompletedPayments">0</div>
+                        <div class="stat-label">My Completed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="myOverduePayments">0</div>
+                        <div class="stat-label">My Overdue</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="myCollectionRate">0%</div>
+                        <div class="stat-label">My Success Rate</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Daily Tasks Card -->
+        <section class="card">
+            <h3>✅ My Tasks & To-Do</h3>
+            <div class="card-content">
+                <div style="margin-bottom: 15px;">
+                    <button class="btn btn-outline" onclick="loadAgentTasks()">🔄 Refresh Tasks</button>
+                    <span style="color: #3AFCA0; margin-left: 15px;">📞 Prioritize high-priority items first</span>
+                </div>
+                
+                <div id="agentTasks">
+                    <!-- Agent tasks will be loaded here -->
+                </div>
+                
+                <div style="margin-top: 15px; text-align: center;">
+                    <p style="color: #cccccc; font-size: 0.9rem;">
+                        🎯 Focus on high-priority tasks to maximize your daily performance
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Consumer Quick Actions Card -->
+        <section class="card">
+            <h3>🎯 Quick Actions</h3>
+            <div class="card-content">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div>
+                        <h4 style="color: #1ECBE1; margin-bottom: 10px;">Consumer Management</h4>
+                        <button class="btn btn-sm" onclick="openConsumerQuickAccess()">🔍 Find Consumer (Alt+C)</button>
+                        <button class="btn btn-outline btn-sm" onclick="loadAssignedAccounts()">📋 View All Assigned</button>
+                    </div>
+                    
+                    <div>
+                        <h4 style="color: #1ECBE1; margin-bottom: 10px;">Payment Processing</h4>
+                        <button class="btn btn-sm" onclick="showQuickPaymentForm()">💰 Quick Payment</button>
+                        <button class="btn btn-outline btn-sm" onclick="renderCalendar()">📅 View Calendar</button>
+                    </div>
+                    
+                    <div>
+                        <h4 style="color: #1ECBE1; margin-bottom: 10px;">Communication</h4>
+                        <button class="btn btn-sm" onclick="showQuickNoteForm()">📝 Quick Note</button>
+                        <button class="btn btn-outline btn-sm" onclick="showCallLogForm()">📞 Log Call</button>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 15px; background: rgba(58, 252, 160, 0.1); border-radius: 8px;">
+                    <h4 style="color: #3AFCA0; margin-bottom: 10px;">💡 Quick Tips</h4>
+                    <ul style="color: #cccccc; font-size: 0.9rem; margin: 0; padding-left: 20px;">
+                        <li>Use <strong>Alt+C</strong> for instant consumer search</li>
+                        <li>Update account status after each interaction</li>
+                        <li>Add detailed notes for better follow-up</li>
+                        <li>Check payment calendar daily for due payments</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Agent Reports Card -->
+        <section class="card">
+            <h3>📈 My Performance Reports</h3>
+            <div class="card-content">
+                <div style="margin-bottom: 15px;">
+                    <button class="btn btn-outline" onclick="loadAgentReports()">📊 Load My Stats</button>
+                    <span style="color: #1ECBE1; margin-left: 15px;">📈 Track your progress and achievements</span>
+                </div>
+                
+                <div id="agentReports">
+                    <!-- Agent reports will be loaded here -->
+                </div>
+                
+                <div style="margin-top: 15px; text-align: center;">
+                    <p style="color: #cccccc; font-size: 0.9rem;">
+                        🏆 Your individual performance metrics and insights
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Quick Access Notification -->
+    <div style="position: fixed; bottom: 20px; right: 20px; background: linear-gradient(135deg, #1ECBE1, #3AFCA0); color: #101419; padding: 10px 15px; border-radius: 8px; font-size: 0.9rem; z-index: 1000;">
+        <strong>🔥 Quick Access:</strong> Alt+C for Consumer Search | Ctrl+Shift+R for Emergency Reset
+    </div>
+
+    <!-- Loading Scripts -->
+    <script src="js/shared-functions.js"></script>
+    <script src="js/calendar-functions.js"></script>
+    <script src="js/agent-functions.js"></script>
+
+    <script>
+        // Initialize agent portal
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 S.E.F. Contact Engine CRM - Agent Portal Loading...');
+            
+            // Get saved role or default to agent1
+            const savedRole = localStorage.getItem('currentRole') || 'agent1';
+            currentRole = savedRole;
+            
+            // Update UI for current role
+            updateUIForRole(currentRole);
+            updatePortalTitle();
+            
+            // Initialize agent dashboard
+            initializeAgentDashboard();
+            
+            // Initialize calendar with agent filter
+            initializeCalendar('agentCalendar');
+            
+            // Load initial data
+            loadAssignedAccounts();
+            loadAgentTasks();
+            updateAgentPaymentMetrics();
+            
+            console.log(`✅ Agent Portal Ready for ${getCurrentAgentName()}!`);
+            showNotification(`Welcome ${getCurrentAgentName()}!`, 'success', 3000);
+        });
+
+        // Update portal title based on current agent
+        function updatePortalTitle() {
+            const titleElement = document.getElementById('portalTitle');
+            const agentName = getCurrentAgentName();
+            titleElement.textContent = `S.E.F. Contact Engine CRM - ${agentName}`;
+        }
+
+        // Role selector handler
+        document.getElementById('roleSelector').addEventListener('change', function(e) {
+            const selectedRole = e.target.value;
+            
+            if (selectedRole === 'admin') {
+                // Redirect to admin portal
+                localStorage.setItem('currentRole', 'admin');
+                window.location.href = 'admin-portal.html';
+            } else {
+                // Switch agent role
+                currentRole = selectedRole;
+                localStorage.setItem('currentRole', selectedRole);
+                updateUIForRole(selectedRole);
+                updatePortalTitle();
+                
+                // Refresh agent-specific data
+                initializeAgentDashboard();
+                loadAssignedAccounts();
+                updateAgentPaymentMetrics();
+                
+                showNotification(`Switched to ${getCurrentAgentName()}`, 'success');
+            }
+        });
+
+        // Update agent-specific payment metrics
+        function updateAgentPaymentMetrics() {
+            if (typeof getPaymentsByAgent === 'function') {
+                const agentPayments = getPaymentsByAgent(currentRole);
+                
+                const pendingPayments = agentPayments.filter(p => p.status === 'pending').length;
+                const completedPayments = agentPayments.filter(p => p.status === 'completed').length;
+                const overduePayments = agentPayments.filter(p => p.status === 'overdue').length;
+                const totalPayments = agentPayments.length;
+                
+                const successRate = totalPayments > 0 ? ((completedPayments / totalPayments) * 100).toFixed(1) : 0;
+                
+                // Update agent payment metrics
+                const elements = {
+                    myPendingPayments: document.getElementById('myPendingPayments'),
+                    myCompletedPayments: document.getElementById('myCompletedPayments'),
+                    myOverduePayments: document.getElementById('myOverduePayments'),
+                    myCollectionRate: document.getElementById('myCollectionRate')
+                };
+                
+                if (elements.myPendingPayments) elements.myPendingPayments.textContent = pendingPayments;
+                if (elements.myCompletedPayments) elements.myCompletedPayments.textContent = completedPayments;
+                if (elements.myOverduePayments) elements.myOverduePayments.textContent = overduePayments;
+                if (elements.myCollectionRate) elements.myCollectionRate.textContent = successRate + '%';
+            }
+        }
+
+        // Quick payment form
+        function showQuickPaymentForm() {
+            const modalContent = `
+                <div class="modal-header">
+                    <h2>Quick Payment Entry</h2>
+                    <span class="close" onclick="closeModal('quickPaymentModal')">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="quickPaymentForm" onsubmit="processQuickPayment(event)">
+                        <div class="form-group">
+                            <label>Consumer (Search to select)</label>
+                            <input type="text" id="consumerSearchQuick" class="form-control" placeholder="Type consumer name or account..." required>
+                            <div id="consumerSelectResults" style="margin-top: 10px;"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Payment Amount</label>
+                            <input type="number" class="form-control" placeholder="0.00" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Payment Method</label>
+                            <select class="form-control" required>
+                                <option value="">Select method</option>
+                                <option value="credit_card">Credit Card</option>
+                                <option value="bank_transfer">Bank Transfer</option>
+                                <option value="ach">ACH</option>
+                                <option value="check">Check</option>
+                                <option value="cash">Cash</option>
+                            </select>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <button type="submit" class="btn">Record Payment</button>
+                            <button type="button" class="btn btn-outline" onclick="closeModal('quickPaymentModal')">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            showModal('quickPaymentModal', modalContent);
+            
+            // Setup consumer search
+            const searchInput = document.getElementById('consumerSearchQuick');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    searchConsumersForQuickPayment(e.target.value);
+                });
+            }
+        }
+
+        // Search consumers for quick payment
+        function searchConsumersForQuickPayment(searchTerm) {
+            const resultsContainer = document.getElementById('consumerSelectResults');
+            if (!resultsContainer) return;
+            
+            if (!searchTerm.trim()) {
+                resultsContainer.innerHTML = '';
+                return;
+            }
+            
+            const agentAccounts = getAgentAccounts();
+            const matches = agentAccounts.filter(consumer => 
+                consumer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                consumer.accountNumber.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            
+            if (matches.length === 0) {
+                resultsContainer.innerHTML = '<p style="color: #FF9533;">No matching consumers found</p>';
+                return;
+            }
+            
+            const resultsHTML = matches.map(consumer => `
+                <div class="consumer-select-item" style="padding: 8px; border: 1px solid #1ECBE1; border-radius: 4px; margin-bottom: 5px; cursor: pointer;" onclick="selectConsumerForQuickPayment('${consumer.id}', '${consumer.name}')">
+                    <div style="font-weight: bold; color: #1ECBE1;">${consumer.name}</div>
+                    <div style="color: #cccccc; font-size: 0.9rem;">${consumer.accountNumber} • Balance: ${formatCurrency(consumer.balance)}</div>
+                </div>
+            `).join('');
+            
+            resultsContainer.innerHTML = resultsHTML;
+        }
+
+        // Select consumer for quick payment
+        function selectConsumerForQuickPayment(consumerId, consumerName) {
+            document.getElementById('consumerSearchQuick').value = consumerName;
+            document.getElementById('consumerSearchQuick').setAttribute('data-consumer-id', consumerId);
+            document.getElementById('consumerSelectResults').innerHTML = '';
+        }
+
+        // Process quick payment
+        function processQuickPayment(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const consumerId = document.getElementById('consumerSearchQuick').getAttribute('data-consumer-id');
+            
+            if (!consumerId) {
+                showNotification('Please select a consumer', 'error');
+                return;
+            }
+            
+            // Use the existing addPayment functionality
+            closeModal('quickPaymentModal');
+            addPayment(consumerId);
+        }
+
+        // Quick note form
+        function showQuickNoteForm() {
+            showNotification('Quick Note: Use Alt+C to find consumer, then click "Add Note"', 'info', 4000);
+            openConsumerQuickAccess();
+        }
+
+        // Call log form
+        function showCallLogForm() {
+            showNotification('Call Log: Use Alt+C to find consumer, then add a contact note', 'info', 4000);
+            openConsumerQuickAccess();
+        }
+
+        // Enhanced keyboard shortcuts for agents
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+Shift+Q for Quick Payment
+            if (e.ctrlKey && e.shiftKey && e.key === 'Q') {
+                e.preventDefault();
+                showQuickPaymentForm();
+            }
+            
+            // Ctrl+Shift+T for Tasks
+            if (e.ctrlKey && e.shiftKey && e.key === 'T') {
+                e.preventDefault();
+                loadAgentTasks();
+            }
+        });
+
+        // Auto-refresh agent data every 60 seconds
+        setInterval(function() {
+            if (document.visibilityState === 'visible') {
+                updateAgentMetrics();
+                updateAgentPaymentMetrics();
+            }
+        }, 60000);
+
+        // Utility function for modals
+        function showModal(modalId, content) {
+            let modal = document.getElementById(modalId);
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = modalId;
+                modal.className = 'modal';
+                modal.innerHTML = '<div class="modal-content" id="' + modalId + 'Content"></div>';
+                document.body.appendChild(modal);
+            }
+            
+            document.getElementById(modalId + 'Content').innerHTML = content;
+            openModal(modalId);
+        }
+    </script>
+
+    <!-- Status indicator -->
+    <div id="connectionStatus" style="position: fixed; top: 70px; right: 20px; padding: 5px 10px; background: #3AFCA0; color: #101419; border-radius: 15px; font-size: 0.8rem; font-weight: 600; z-index: 1001;">
+        <span id="agentStatus">🟢 Agent Portal Active</span>
+    </div>
+
+    <script>
+        // Update status indicator with agent name
+        function updateStatusIndicator() {
+            const statusElement = document.getElementById('agentStatus');
+            if (statusElement) {
+                statusElement.textContent = `🟢 ${getCurrentAgentName()} Active`;
+            }
+        }
+        
+        // Update status when page loads
+        setTimeout(updateStatusIndicator, 1000);
+    </script>
+</body>
+</html>
